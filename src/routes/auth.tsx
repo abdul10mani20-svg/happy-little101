@@ -25,8 +25,9 @@ function AuthPage() {
       const { data: admin } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" });
       if (admin) { await navigate({ to: "/dashboard", replace: true }); return; }
       const fallbackName = String(data.user.user_metadata?.["full_name"] ?? data.user.user_metadata?.["name"] ?? data.user.email?.split("@")[0] ?? "Administrator");
-      const { data: claimed } = await supabase.rpc("claim_first_admin", { _display_name: fallbackName });
+      const { data: claimed, error: claimError } = await supabase.rpc("claim_first_admin", { _display_name: fallbackName });
       if (claimed) { await navigate({ to: "/dashboard", replace: true }); return; }
+      if (claimError) { setMessage("We could not verify your access just now. Please try again."); return; }
       await supabase.auth.signOut();
       setMessage("This account is not authorized for administration.");
     });
@@ -46,7 +47,8 @@ function AuthPage() {
       const { data: user } = await supabase.auth.getUser(); if (!user.user) throw new Error("Unable to verify account");
       const name = form.name || String(user.user.user_metadata?.["display_name"] ?? user.user.email?.split("@")[0] ?? "Administrator");
       const { data: claimed, error: claimError } = await supabase.rpc("claim_first_admin", { _display_name: name });
-      if (claimError || !claimed) { await supabase.auth.signOut(); setMessage("An administrator already exists. Ask them to authorize this account."); return; }
+      if (claimError) { setMessage("We could not verify your access just now. Please try again."); return; }
+      if (!claimed) { await supabase.auth.signOut(); setMessage("An administrator already exists. Ask them to authorize this account."); return; }
       await navigate({ to: "/dashboard", replace: true });
     } catch (error) { toast.error(error instanceof Error ? error.message : "Unable to continue"); } finally { setBusy(false); }
   }
