@@ -14,16 +14,352 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: Database["public"]["Enums"]["audit_action"]
+          administrator_id: string | null
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          id: string
+          license_id: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["audit_action"]
+          administrator_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          license_id?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["audit_action"]
+          administrator_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          license_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          created_at: string
+          email: string | null
+          handle: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          handle?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          handle?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      license_activations: {
+        Row: {
+          activated_at: string
+          deactivated_at: string | null
+          device_hash: string
+          id: string
+          last_seen_at: string
+          license_id: string
+          product_identifier: string
+        }
+        Insert: {
+          activated_at?: string
+          deactivated_at?: string | null
+          device_hash: string
+          id?: string
+          last_seen_at?: string
+          license_id: string
+          product_identifier: string
+        }
+        Update: {
+          activated_at?: string
+          deactivated_at?: string | null
+          device_hash?: string
+          id?: string
+          last_seen_at?: string
+          license_id?: string
+          product_identifier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "license_activations_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      licenses: {
+        Row: {
+          activated_at: string | null
+          amount_paid: number | null
+          archived_at: string | null
+          created_at: string
+          created_by: string
+          customer_id: string
+          duration_seconds: number
+          expires_at: string | null
+          id: string
+          key_ciphertext: string
+          key_hash: string
+          key_preview: string
+          license_type: Database["public"]["Enums"]["license_type"]
+          notes: string | null
+          payment_reference: string | null
+          product_id: string
+          revoked_at: string | null
+          state: Database["public"]["Enums"]["license_state"]
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          amount_paid?: number | null
+          archived_at?: string | null
+          created_at?: string
+          created_by: string
+          customer_id: string
+          duration_seconds: number
+          expires_at?: string | null
+          id?: string
+          key_ciphertext: string
+          key_hash: string
+          key_preview: string
+          license_type: Database["public"]["Enums"]["license_type"]
+          notes?: string | null
+          payment_reference?: string | null
+          product_id: string
+          revoked_at?: string | null
+          state?: Database["public"]["Enums"]["license_state"]
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          amount_paid?: number | null
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string
+          customer_id?: string
+          duration_seconds?: number
+          expires_at?: string | null
+          id?: string
+          key_ciphertext?: string
+          key_hash?: string
+          key_preview?: string
+          license_type?: Database["public"]["Enums"]["license_type"]
+          notes?: string | null
+          payment_reference?: string | null
+          product_id?: string
+          revoked_at?: string | null
+          state?: Database["public"]["Enums"]["license_state"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string
+          id: string
+          identifier: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identifier: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identifier?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      validation_rate_limits: {
+        Row: {
+          attempt_count: number
+          bucket_key: string
+          window_start: string
+        }
+        Insert: {
+          attempt_count?: number
+          bucket_key: string
+          window_start: string
+        }
+        Update: {
+          attempt_count?: number
+          bucket_key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_create_license: {
+        Args: {
+          _amount_paid: number
+          _customer_name: string
+          _customer_notes: string
+          _duration_seconds: number
+          _email: string
+          _handle: string
+          _key_ciphertext: string
+          _key_hash: string
+          _key_preview: string
+          _license_notes: string
+          _license_type: Database["public"]["Enums"]["license_type"]
+          _payment_reference: string
+          _phone: string
+          _product_identifier: string
+        }
+        Returns: string
+      }
+      admin_license_action: {
+        Args: { _action: string; _license_id: string; _seconds?: number }
+        Returns: Json
+      }
+      admin_update_customer: {
+        Args: {
+          _amount_paid: number
+          _email: string
+          _handle: string
+          _license_id: string
+          _license_notes: string
+          _name: string
+          _notes: string
+          _payment_reference: string
+          _phone: string
+        }
+        Returns: undefined
+      }
+      claim_first_admin: { Args: { _display_name: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      public_license_operation: {
+        Args: {
+          _bucket_key: string
+          _device_hash: string
+          _key_hash: string
+          _operation: string
+          _product_identifier: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
+      audit_action:
+        | "license_created"
+        | "license_activated"
+        | "license_revoked"
+        | "license_reactivated"
+        | "license_extended"
+        | "device_reset"
+        | "customer_updated"
+        | "license_archived"
+        | "license_deactivated"
+      license_state: "active" | "revoked"
+      license_type: "trial" | "paid" | "custom"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +486,21 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+      audit_action: [
+        "license_created",
+        "license_activated",
+        "license_revoked",
+        "license_reactivated",
+        "license_extended",
+        "device_reset",
+        "customer_updated",
+        "license_archived",
+        "license_deactivated",
+      ],
+      license_state: ["active", "revoked"],
+      license_type: ["trial", "paid", "custom"],
+    },
   },
 } as const

@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.public_license_operation(text,text,text,text,text) FROM anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.public_license_operation(text,text,text,text,text) TO service_role;
