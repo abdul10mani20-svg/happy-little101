@@ -36,6 +36,13 @@
       "when": 1789855540979,
       "tag": "0004_configurable_device_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789855800166,
+      "tag": "0005_restrict_new_admin_functions_from_anon",
+      "breakpoints": true
     }
   ]
 }
