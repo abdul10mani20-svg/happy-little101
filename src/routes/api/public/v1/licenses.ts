@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/public/v1/licenses")({
     if (!url || !key) return Response.json({ valid: false, status: "unavailable" }, { status: 503 });
     const client = createClient<Database>(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     const { hashValue } = await import("@/lib/license-crypto.server");
-    const ip = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+    const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
     const { data, error } = await client.rpc("public_license_operation", {
       _operation: parsed.data.operation,
       _key_hash: hashValue(parsed.data.licenseKey.toUpperCase()),
