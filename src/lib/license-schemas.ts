@@ -20,16 +20,22 @@ export const createLicenseSchema = z.object({
   duration: durationSchema,
   amountPaid: z.coerce.number().min(0).max(9999999999).default(0),
   paymentReference: z.string().trim().max(120).default(""),
+  deviceLimit: z.coerce.number().int().min(1).max(100).default(1),
 });
 
-export const updateCustomerSchema = createLicenseSchema.omit({ licenseType: true, duration: true }).extend({
-  licenseId: z.string().uuid(),
-});
+export const updateCustomerSchema = createLicenseSchema
+  .omit({ licenseType: true, duration: true, deviceLimit: true })
+  .extend({ licenseId: z.string().uuid() });
 
 export const licenseActionSchema = z.object({
   licenseId: z.string().uuid(),
   action: z.enum(["extend", "revoke", "reactivate", "reset_device", "archive"]),
   seconds: z.coerce.number().int().positive().optional(),
+});
+
+export const deviceLimitSchema = z.object({
+  licenseId: z.string().uuid(),
+  deviceLimit: z.coerce.number().int().min(1).max(100),
 });
 
 export const validationRequestSchema = z.object({
