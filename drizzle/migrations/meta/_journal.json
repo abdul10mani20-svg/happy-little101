@@ -29,6 +29,13 @@
       "when": 1789855499388,
       "tag": "0003_device_limit_enum",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789855540979,
+      "tag": "0004_configurable_device_limits",
+      "breakpoints": true
     }
   ]
 }

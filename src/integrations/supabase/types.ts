@@ -152,6 +152,7 @@ export type Database = {
           created_at: string
           created_by: string
           customer_id: string
+          device_limit: number
           duration_seconds: number
           expires_at: string | null
           id: string
@@ -173,6 +174,7 @@ export type Database = {
           created_at?: string
           created_by: string
           customer_id: string
+          device_limit?: number
           duration_seconds: number
           expires_at?: string | null
           id?: string
@@ -194,6 +196,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           customer_id?: string
+          device_limit?: number
           duration_seconds?: number
           expires_at?: string | null
           id?: string
@@ -295,6 +298,7 @@ export type Database = {
           _amount_paid: number
           _customer_name: string
           _customer_notes: string
+          _device_limit: number
           _duration_seconds: number
           _email: string
           _handle: string
@@ -311,6 +315,10 @@ export type Database = {
       }
       admin_license_action: {
         Args: { _action: string; _license_id: string; _seconds?: number }
+        Returns: Json
+      }
+      admin_set_device_limit: {
+        Args: { _device_limit: number; _license_id: string }
         Returns: Json
       }
       admin_update_customer: {
