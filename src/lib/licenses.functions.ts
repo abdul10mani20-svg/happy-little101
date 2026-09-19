@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { createLicenseSchema, durationToSeconds, licenseActionSchema, updateCustomerSchema } from "./license-schemas";
+import { createLicenseSchema, deviceLimitSchema, durationToSeconds, licenseActionSchema, updateCustomerSchema } from "./license-schemas";
 
 async function requireAdmin(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
@@ -18,12 +18,17 @@ export const getAdminWorkspace = createServerFn({ method: "GET" })
       context.supabase.from("admin_profiles").select("display_name").eq("id", context.userId).maybeSingle(),
     ]);
     if (error) throw new Error("Unable to load licenses");
-    const rows = (licenses ?? []).map((license: any) => ({
-      ...license,
-      key_ciphertext: undefined,
-      key_hash: undefined,
-      active_device: license.license_activations?.find((item: any) => !item.deactivated_at) ?? null,
-    }));
+    const rows = (licenses ?? []).map((license: any) => {
+      const activeDevices = (license.license_activations ?? []).filter((item: any) => !item.deactivated_at);
+      return {
+        ...license,
+        key_ciphertext: undefined,
+        key_hash: undefined,
+        active_devices: activeDevices,
+        active_device_count: activeDevices.length,
+        active_device: activeDevices[0] ?? null,
+      };
+    });
     const names = new Map((profiles ?? []).map((item: any) => [item.id, item.display_name]));
     const auditRows = (audits ?? []).map((item: any) => ({ ...item, administrator_name: item.administrator_id ? names.get(item.administrator_id) ?? "Administrator" : "Validation API" }));
     return { licenses: rows, audits: auditRows, profile: profile ?? null, now: new Date().toISOString() };
@@ -51,6 +56,7 @@ export const createLicense = createServerFn({ method: "POST" })
       _amount_paid: data.amountPaid,
       _payment_reference: data.paymentReference,
       _license_notes: data.licenseNotes,
+      _device_limit: data.deviceLimit,
     });
     if (error || !id) throw new Error(error?.message ?? "Unable to create license");
     return { id, licenseKey: key };
@@ -82,4 +88,17 @@ export const performLicenseAction = createServerFn({ method: "POST" })
     const { data: result, error } = await context.supabase.rpc("admin_license_action", args);
     if (error) throw new Error(error.message);
     return result;
+  });
+
+export const setDeviceLimit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => deviceLimitSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { error } = await context.supabase.rpc("admin_set_device_limit", {
+      _license_id: data.licenseId,
+      _device_limit: data.deviceLimit,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });

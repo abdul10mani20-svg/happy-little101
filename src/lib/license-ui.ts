@@ -5,6 +5,7 @@ export type LicenseRow = {
   state: "active" | "revoked"; duration_seconds: number; created_at: string; activated_at: string | null;
   expires_at: string | null; archived_at: string | null; amount_paid: number | null; payment_reference: string | null;
   notes: string | null; customers: Customer; license_activations: Activation[]; active_device: Activation | null;
+  device_limit: number; active_devices: Activation[]; active_device_count: number;
 };
 export type AuditRow = { id: string; action: string; created_at: string; license_id: string | null; before_data: unknown; after_data: unknown; administrator_name: string };
 

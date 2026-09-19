@@ -1,11 +1,16 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 
+// Accepts either a 32-byte hex secret or any other sufficiently long secret string,
+// which is stretched into a 32-byte key. This keeps a correctly provisioned secret
+// byte-identical while tolerating non-hex secret formats.
 function encryptionKey() {
   const value = process.env["LICENSE_ENCRYPTION_KEY"];
-  if (!value || !/^[a-fA-F0-9]{64}$/.test(value)) {
+  if (!value || value.trim().length < 32) {
     throw new Error("License encryption is not configured");
   }
-  return Buffer.from(value, "hex");
+  const secret = value.trim();
+  if (/^[a-fA-F0-9]{64}$/.test(secret)) return Buffer.from(secret, "hex");
+  return createHash("sha256").update(secret, "utf8").digest();
 }
 
 export function hashValue(value: string) {

@@ -22,6 +22,27 @@
       "when": 1789848578097,
       "tag": "0002_restrict_security_definer_execution",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789855499388,
+      "tag": "0003_device_limit_enum",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789855540979,
+      "tag": "0004_configurable_device_limits",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789855800166,
+      "tag": "0005_restrict_new_admin_functions_from_anon",
+      "breakpoints": true
     }
   ]
 }
