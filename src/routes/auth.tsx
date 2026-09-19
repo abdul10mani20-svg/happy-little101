@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({ denied: search.denied === true || search.denied === "true" }),
+  validateSearch: (search: Record<string, unknown>) => ({ denied: search["denied"] === true || search["denied"] === "true" }),
   head: () => ({ meta: [{ title: "Administrator sign in — License Control" }, { name: "description", content: "Secure administrator access for License Control." }, { property: "og:title", content: "Administrator sign in — License Control" }, { property: "og:description", content: "Secure administrator access for License Control." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AuthPage,
 });
@@ -33,7 +33,7 @@ function AuthPage() {
         if (!data.session) { setMessage("Check your email to confirm your account, then sign in."); setMode("signin"); return; }
       } else { const { error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password }); if (error) throw error; }
       const { data: user } = await supabase.auth.getUser(); if (!user.user) throw new Error("Unable to verify account");
-      const name = form.name || String(user.user.user_metadata?.display_name ?? user.user.email?.split("@")[0] ?? "Administrator");
+      const name = form.name || String(user.user.user_metadata?.["display_name"] ?? user.user.email?.split("@")[0] ?? "Administrator");
       const { data: claimed, error: claimError } = await supabase.rpc("claim_first_admin", { _display_name: name });
       if (claimError || !claimed) { await supabase.auth.signOut(); setMessage("An administrator already exists. Ask them to authorize this account."); return; }
       await navigate({ to: "/dashboard", replace: true });

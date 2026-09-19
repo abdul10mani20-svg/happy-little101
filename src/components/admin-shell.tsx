@@ -18,7 +18,7 @@ export function AdminShell({ title, description, action, children }: { title: st
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
-    await navigate({ to: "/auth", replace: true });
+    await navigate({ to: "/auth", search: { denied: false }, replace: true });
   }
   return <div className="min-h-screen bg-background text-foreground">
     <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
