@@ -56,6 +56,7 @@ export const createLicense = createServerFn({ method: "POST" })
       _amount_paid: data.amountPaid,
       _payment_reference: data.paymentReference,
       _license_notes: data.licenseNotes,
+      _device_limit: data.deviceLimit,
     });
     if (error || !id) throw new Error(error?.message ?? "Unable to create license");
     return { id, licenseKey: key };
