@@ -19,7 +19,18 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [busy, setBusy] = useState(false); const [message, setMessage] = useState(denied ? "This account is not authorized for administration." : "");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  useEffect(() => { supabase.auth.getUser().then(async ({ data }) => { if (!data.user) return; const { data: admin } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" }); if (admin) navigate({ to: "/dashboard", replace: true }); }); }, [navigate]);
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: admin } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" });
+      if (admin) { await navigate({ to: "/dashboard", replace: true }); return; }
+      const fallbackName = String(data.user.user_metadata?.["full_name"] ?? data.user.user_metadata?.["name"] ?? data.user.email?.split("@")[0] ?? "Administrator");
+      const { data: claimed } = await supabase.rpc("claim_first_admin", { _display_name: fallbackName });
+      if (claimed) { await navigate({ to: "/dashboard", replace: true }); return; }
+      await supabase.auth.signOut();
+      setMessage("This account is not authorized for administration.");
+    });
+  }, [navigate]);
   async function submit(event: React.FormEvent) {
     event.preventDefault(); setBusy(true); setMessage("");
     try {
