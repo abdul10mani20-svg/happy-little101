@@ -89,3 +89,16 @@ export const performLicenseAction = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return result;
   });
+
+export const setDeviceLimit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => deviceLimitSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { error } = await context.supabase.rpc("admin_set_device_limit", {
+      _license_id: data.licenseId,
+      _device_limit: data.deviceLimit,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
