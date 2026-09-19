@@ -11,21 +11,22 @@ export const getAdminWorkspace = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await requireAdmin(context);
-    const [{ data: licenses, error }, { data: audits }, { data: profile }] = await Promise.all([
+    const [{ data: licenses, error }, { data: audits }, { data: profiles }, { data: profile }] = await Promise.all([
       context.supabase.from("licenses").select("*, customers(*), license_activations(*)").is("archived_at", null).order("created_at", { ascending: false }),
-      context.supabase.from("audit_logs").select("*, admin_profiles(display_name)").order("created_at", { ascending: false }).limit(100),
+      context.supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(100),
+      context.supabase.from("admin_profiles").select("id, display_name"),
       context.supabase.from("admin_profiles").select("display_name").eq("id", context.userId).maybeSingle(),
     ]);
     if (error) throw new Error("Unable to load licenses");
-    const { decryptLicenseKey } = await import("./license-crypto.server");
     const rows = (licenses ?? []).map((license: any) => ({
       ...license,
-      license_key: decryptLicenseKey(license.key_ciphertext),
       key_ciphertext: undefined,
       key_hash: undefined,
       active_device: license.license_activations?.find((item: any) => !item.deactivated_at) ?? null,
     }));
-    return { licenses: rows, audits: audits ?? [], profile: profile ?? null, now: new Date().toISOString() };
+    const names = new Map((profiles ?? []).map((item: any) => [item.id, item.display_name]));
+    const auditRows = (audits ?? []).map((item: any) => ({ ...item, administrator_name: item.administrator_id ? names.get(item.administrator_id) ?? "Administrator" : "Validation API" }));
+    return { licenses: rows, audits: auditRows, profile: profile ?? null, now: new Date().toISOString() };
   });
 
 export const createLicense = createServerFn({ method: "POST" })
@@ -75,9 +76,10 @@ export const performLicenseAction = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
     if (data.action === "extend" && !data.seconds) throw new Error("Enter an extension duration");
-    const { data: result, error } = await context.supabase.rpc("admin_license_action", {
-      _license_id: data.licenseId, _action: data.action, _seconds: data.seconds,
-    });
+    const args = data.seconds === undefined
+      ? { _license_id: data.licenseId, _action: data.action }
+      : { _license_id: data.licenseId, _action: data.action, _seconds: data.seconds };
+    const { data: result, error } = await context.supabase.rpc("admin_license_action", args);
     if (error) throw new Error(error.message);
     return result;
   });
