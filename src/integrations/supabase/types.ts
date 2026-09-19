@@ -358,6 +358,7 @@ export type Database = {
         | "customer_updated"
         | "license_archived"
         | "license_deactivated"
+        | "device_limit_updated"
       license_state: "active" | "revoked"
       license_type: "trial" | "paid" | "custom"
     }
@@ -498,6 +499,7 @@ export const Constants = {
         "customer_updated",
         "license_archived",
         "license_deactivated",
+        "device_limit_updated",
       ],
       license_state: ["active", "revoked"],
       license_type: ["trial", "paid", "custom"],
