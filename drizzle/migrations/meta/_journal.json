@@ -8,6 +8,13 @@
       "when": 1789845779532,
       "tag": "0000_license_administration_core",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789845846705,
+      "tag": "0001_tighten_public_license_operation",
+      "breakpoints": true
     }
   ]
 }
