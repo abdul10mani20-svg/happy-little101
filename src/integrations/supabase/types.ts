@@ -367,6 +367,9 @@ export type Database = {
         | "license_archived"
         | "license_deactivated"
         | "device_limit_updated"
+        | "license_deleted"
+        | "licenses_bulk_deleted"
+        | "license_key_revealed"
       license_state: "active" | "revoked"
       license_type: "trial" | "paid" | "custom"
     }
@@ -508,6 +511,9 @@ export const Constants = {
         "license_archived",
         "license_deactivated",
         "device_limit_updated",
+        "license_deleted",
+        "licenses_bulk_deleted",
+        "license_key_revealed",
       ],
       license_state: ["active", "revoked"],
       license_type: ["trial", "paid", "custom"],

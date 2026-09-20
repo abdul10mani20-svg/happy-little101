@@ -43,6 +43,13 @@
       "when": 1789855800166,
       "tag": "0005_restrict_new_admin_functions_from_anon",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789908821007,
+      "tag": "0006_add_delete_and_reveal_audit_actions",
+      "breakpoints": true
     }
   ]
 }
