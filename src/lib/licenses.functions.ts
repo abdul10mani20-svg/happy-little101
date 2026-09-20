@@ -102,3 +102,39 @@ export const setDeviceLimit = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const deleteLicense = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => licenseIdSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { error } = await context.supabase.rpc("admin_delete_license", { _license_id: data.licenseId });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const bulkDeleteLicenses = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => bulkDeleteSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { data: result, error } = await context.supabase.rpc("admin_delete_licenses_bulk", { _scope: data.scope });
+    if (error) throw new Error(error.message);
+    return { deleted: Number((result as any)?.deleted ?? 0) };
+  });
+
+export const revealLicenseKey = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => licenseIdSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { data: ciphertext, error } = await context.supabase.rpc("admin_reveal_license_key", { _license_id: data.licenseId });
+    if (error) throw new Error(error.message);
+    if (!ciphertext) throw new Error("This license key cannot be shown");
+    const { decryptLicenseKey } = await import("./license-crypto.server");
+    try {
+      return { licenseKey: decryptLicenseKey(ciphertext as string) };
+    } catch {
+      throw new Error("This license key cannot be shown because it was stored with a different encryption secret");
+    }
+  });
