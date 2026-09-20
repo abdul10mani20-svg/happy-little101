@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { createLicenseSchema, deviceLimitSchema, durationToSeconds, licenseActionSchema, updateCustomerSchema } from "./license-schemas";
+import { bulkDeleteSchema, createLicenseSchema, deviceLimitSchema, durationToSeconds, licenseActionSchema, licenseIdSchema, updateCustomerSchema } from "./license-schemas";
 
 async function requireAdmin(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
