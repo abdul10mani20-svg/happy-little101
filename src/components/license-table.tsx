@@ -14,8 +14,24 @@ import { effectiveStatus, formatDate, formatDuration, type LicenseRow } from "@/
 import { bulkDeleteLicenses, deleteLicense, performLicenseAction, revealLicenseKey, setDeviceLimit, updateCustomer } from "@/lib/licenses.functions";
 
 export function LicenseTable({ licenses }: { licenses: LicenseRow[] }) {
-  const [search, setSearch] = useState(""); const [status, setStatus] = useState("all"); const [type, setType] = useState("all"); const [selected, setSelected] = useState<LicenseRow | null>(null); const [mode, setMode] = useState<"view" | "edit" | "extend" | "limit">("view");
+  const [search, setSearch] = useState(""); const [status, setStatus] = useState("all"); const [type, setType] = useState("all"); const [selected, setSelected] = useState<LicenseRow | null>(null); const [mode, setMode] = useState<"view" | "edit" | "extend" | "limit" | "reveal">("view");
   const action = useServerFn(performLicenseAction); const update = useServerFn(updateCustomer); const client = useQueryClient();
+  const removeLicense = useServerFn(deleteLicense); const bulkRemove = useServerFn(bulkDeleteLicenses); const [busyBulk, setBusyBulk] = useState<string | null>(null);
+  const expiredCount = useMemo(() => licenses.filter(l => effectiveStatus(l) === "expired").length, [licenses]);
+  const revokedCount = useMemo(() => licenses.filter(l => effectiveStatus(l) === "revoked").length, [licenses]);
+  async function removeOne(license: LicenseRow) {
+    if (!window.confirm(`Permanently delete ${license.key_preview}? This cannot be undone and the key will stop working everywhere.`)) return;
+    try { await removeLicense({ data: { licenseId: license.id } }); await client.invalidateQueries({ queryKey: ["admin-workspace"] }); toast.success("License deleted"); }
+    catch (error) { toast.error(error instanceof Error ? error.message : "Unable to delete license"); }
+  }
+  async function removeMany(scope: "expired" | "revoked", count: number) {
+    if (count === 0) { toast.info(`No ${scope} licenses to delete`); return; }
+    if (!window.confirm(`Permanently delete ${count} ${scope} license${count === 1 ? "" : "s"}? This cannot be undone.`)) return;
+    setBusyBulk(scope);
+    try { const result = await bulkRemove({ data: { scope } }); await client.invalidateQueries({ queryKey: ["admin-workspace"] }); toast.success(`${result.deleted} license${result.deleted === 1 ? "" : "s"} deleted`); }
+    catch (error) { toast.error(error instanceof Error ? error.message : "Unable to delete licenses"); }
+    finally { setBusyBulk(null); }
+  }
   const rows = useMemo(() => licenses.filter(l => { const haystack = [l.key_preview, l.customers.name, l.customers.email, l.customers.phone, l.customers.handle].join(" ").toLowerCase(); return haystack.includes(search.toLowerCase()) && (status === "all" || effectiveStatus(l) === status) && (type === "all" || l.license_type === type); }), [licenses, search, status, type]);
   async function run(license: LicenseRow, nextAction: "revoke" | "reactivate" | "reset_device" | "archive", warning: string) { if (!window.confirm(warning)) return; try { await action({ data: { licenseId: license.id, action: nextAction } }); await client.invalidateQueries({ queryKey: ["admin-workspace"] }); toast.success("License updated"); } catch (error) { toast.error(error instanceof Error ? error.message : "Update failed"); } }
   return <><div className="border bg-card"><div className="flex flex-col gap-3 border-b p-4 lg:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" /><Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search key, customer, phone, email, handle…" className="pl-9" /></div><Select value={status} onValueChange={setStatus}><SelectTrigger className="lg:w-44"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All statuses</SelectItem><SelectItem value="active">Active</SelectItem><SelectItem value="unactivated">Unactivated</SelectItem><SelectItem value="expired">Expired</SelectItem><SelectItem value="revoked">Revoked</SelectItem></SelectContent></Select><Select value={type} onValueChange={setType}><SelectTrigger className="lg:w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All types</SelectItem><SelectItem value="trial">Trial</SelectItem><SelectItem value="paid">Paid</SelectItem><SelectItem value="custom">Custom</SelectItem></SelectContent></Select></div>
