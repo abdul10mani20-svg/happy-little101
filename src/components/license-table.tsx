@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { Archive, Ban, Ellipsis, KeyRound, MonitorSmartphone, Pencil, RefreshCcw, RotateCcw, Search } from "lucide-react";
+import { Archive, Ban, Copy, Ellipsis, Eye, KeyRound, MonitorSmartphone, Pencil, RefreshCcw, RotateCcw, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "./status-badge";
 import { effectiveStatus, formatDate, formatDuration, type LicenseRow } from "@/lib/license-ui";
-import { performLicenseAction, setDeviceLimit, updateCustomer } from "@/lib/licenses.functions";
+import { bulkDeleteLicenses, deleteLicense, performLicenseAction, revealLicenseKey, setDeviceLimit, updateCustomer } from "@/lib/licenses.functions";
 
 export function LicenseTable({ licenses }: { licenses: LicenseRow[] }) {
   const [search, setSearch] = useState(""); const [status, setStatus] = useState("all"); const [type, setType] = useState("all"); const [selected, setSelected] = useState<LicenseRow | null>(null); const [mode, setMode] = useState<"view" | "edit" | "extend" | "limit">("view");
