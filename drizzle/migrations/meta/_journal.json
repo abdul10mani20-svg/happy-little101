@@ -50,6 +50,13 @@
       "when": 1789908821007,
       "tag": "0006_add_delete_and_reveal_audit_actions",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789908848482,
+      "tag": "0007_add_license_delete_and_reveal_functions",
+      "breakpoints": true
     }
   ]
 }
