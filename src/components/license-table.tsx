@@ -51,7 +51,7 @@ function RevealPanel({ license }: { license: LicenseRow }) {
   }
   return <div className="space-y-4">
     {value
-      ? <div className="space-y-3"><p className="break-all rounded-md bg-muted p-3 text-center font-mono text-base font-semibold">{value}</p><Button variant="outline" className="w-full" onClick={() => { navigator.clipboard.writeText(value); toast.success("License key copied"); }}><Copy />Copy key</Button></div>
+      ? <div className="space-y-3"><p className="break-all rounded-md bg-muted p-3 text-center font-mono text-base font-semibold select-all">{value}</p><Button variant="outline" className="w-full" onClick={() => { navigator.clipboard.writeText(value); toast.success("License key copied"); }}><Copy />Copy key</Button></div>
       : <><p className="text-sm text-muted-foreground">The full key is stored encrypted. Showing it is recorded in the history log.</p>{error && <p className="text-sm text-destructive">{error}</p>}<Button className="w-full" disabled={busy} onClick={reveal}><Eye />{busy ? "Opening…" : "Reveal key"}</Button></>}
   </div>;
 }
