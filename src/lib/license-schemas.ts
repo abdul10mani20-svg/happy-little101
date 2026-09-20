@@ -38,6 +38,10 @@ export const deviceLimitSchema = z.object({
   deviceLimit: z.coerce.number().int().min(1).max(100),
 });
 
+export const licenseIdSchema = z.object({ licenseId: z.string().uuid() });
+
+export const bulkDeleteSchema = z.object({ scope: z.enum(["expired", "revoked"]) });
+
 export const validationRequestSchema = z.object({
   operation: z.enum(["activate", "check", "deactivate"]),
   licenseKey: z.string().trim().min(16).max(100),

@@ -313,9 +313,15 @@ export type Database = {
         }
         Returns: string
       }
+      admin_delete_license: { Args: { _license_id: string }; Returns: Json }
+      admin_delete_licenses_bulk: { Args: { _scope: string }; Returns: Json }
       admin_license_action: {
         Args: { _action: string; _license_id: string; _seconds?: number }
         Returns: Json
+      }
+      admin_reveal_license_key: {
+        Args: { _license_id: string }
+        Returns: string
       }
       admin_set_device_limit: {
         Args: { _device_limit: number; _license_id: string }
@@ -367,6 +373,9 @@ export type Database = {
         | "license_archived"
         | "license_deactivated"
         | "device_limit_updated"
+        | "license_deleted"
+        | "licenses_bulk_deleted"
+        | "license_key_revealed"
       license_state: "active" | "revoked"
       license_type: "trial" | "paid" | "custom"
     }
@@ -508,6 +517,9 @@ export const Constants = {
         "license_archived",
         "license_deactivated",
         "device_limit_updated",
+        "license_deleted",
+        "licenses_bulk_deleted",
+        "license_key_revealed",
       ],
       license_state: ["active", "revoked"],
       license_type: ["trial", "paid", "custom"],
