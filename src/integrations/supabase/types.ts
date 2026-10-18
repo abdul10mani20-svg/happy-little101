@@ -35,6 +35,39 @@ export type Database = {
         }
         Relationships: []
       }
+      api_health_checks: {
+        Row: {
+          api_ok: boolean
+          checked_at: string
+          checked_by: string | null
+          detail: string | null
+          id: string
+          latency_ms: number | null
+          ok: boolean
+          product_ok: boolean
+        }
+        Insert: {
+          api_ok: boolean
+          checked_at?: string
+          checked_by?: string | null
+          detail?: string | null
+          id?: string
+          latency_ms?: number | null
+          ok: boolean
+          product_ok: boolean
+        }
+        Update: {
+          api_ok?: boolean
+          checked_at?: string
+          checked_by?: string | null
+          detail?: string | null
+          id?: string
+          latency_ms?: number | null
+          ok?: boolean
+          product_ok?: boolean
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: Database["public"]["Enums"]["audit_action"]
