@@ -138,3 +138,28 @@ export const revealLicenseKey = createServerFn({ method: "POST" })
       throw new Error("This license key cannot be shown because it was stored with a different encryption secret");
     }
   });
+export const checkLicensingApiHealth = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const origin = new URL(getRequest().url).origin;
+    const checkedAt = new Date().toISOString();
+    const { data: product, error: productError } = await context.supabase.from("products").select("identifier").eq("identifier", "browser-extension-core").maybeSingle();
+    const productOk = !productError && !!product;
+    let apiOk = false;
+    let latencyMs: number | null = null;
+    let detail = "";
+    try {
+      const started = Date.now();
+      // Deliberately invalid body: rejected by validation before any database call, so no license data or rate-limit rows change.
+      const res = await fetch(`${origin}/api/public/v1/licenses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ operation: "health" }) });
+      latencyMs = Date.now() - started;
+      const body = await res.json().catch(() => null);
+      apiOk = res.status === 400 && body?.status === "invalid_request";
+      detail = apiOk ? "Responding" : `Unexpected response (${res.status})`;
+    } catch {
+      detail = "Unreachable";
+    }
+    return { ok: apiOk && productOk, apiOk, productOk, latencyMs, detail, checkedAt };
+  });
