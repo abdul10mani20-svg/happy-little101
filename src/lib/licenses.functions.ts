@@ -161,5 +161,16 @@ export const checkLicensingApiHealth = createServerFn({ method: "GET" })
     } catch {
       detail = "Unreachable";
     }
-    return { ok: apiOk && productOk, apiOk, productOk, latencyMs, detail, checkedAt };
+    const ok = apiOk && productOk;
+    await context.supabase.from("api_health_checks").insert({ ok, api_ok: apiOk, product_ok: productOk, latency_ms: latencyMs, detail: productOk ? detail : "Product missing", checked_at: checkedAt, checked_by: context.userId });
+    return { ok, apiOk, productOk, latencyMs, detail, checkedAt };
+  });
+
+export const getApiHealthHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { data, error } = await context.supabase.from("api_health_checks").select("id, checked_at, ok, latency_ms, detail").order("checked_at", { ascending: false }).limit(50);
+    if (error) throw new Error("Unable to load health history");
+    return data ?? [];
   });
