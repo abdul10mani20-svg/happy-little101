@@ -17,6 +17,7 @@ import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedLicensesRouteImport } from './routes/_authenticated.licenses'
 import { Route as ApiPublicV1LicensesRouteImport } from './routes/api/public/v1/licenses'
+import { Route as ApiPublicV1LicenseVerifyRouteImport } from './routes/api/public/v1/license.verify'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,12 @@ const ApiPublicV1LicensesRoute = ApiPublicV1LicensesRouteImport.update({
   path: '/api/public/v1/licenses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1LicenseVerifyRoute =
+  ApiPublicV1LicenseVerifyRouteImport.update({
+    id: '/api/public/v1/license/verify',
+    path: '/api/public/v1/license/verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/licenses': typeof AuthenticatedLicensesRoute
   '/api/public/v1/licenses': typeof ApiPublicV1LicensesRoute
+  '/api/public/v1/license/verify': typeof ApiPublicV1LicenseVerifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +83,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/licenses': typeof AuthenticatedLicensesRoute
   '/api/public/v1/licenses': typeof ApiPublicV1LicensesRoute
+  '/api/public/v1/license/verify': typeof ApiPublicV1LicenseVerifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +95,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/licenses': typeof AuthenticatedLicensesRoute
   '/api/public/v1/licenses': typeof ApiPublicV1LicensesRoute
+  '/api/public/v1/license/verify': typeof ApiPublicV1LicenseVerifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/licenses'
     | '/api/public/v1/licenses'
+    | '/api/public/v1/license/verify'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/licenses'
     | '/api/public/v1/licenses'
+    | '/api/public/v1/license/verify'
   id:
     | '__root__'
     | '/'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/licenses'
     | '/api/public/v1/licenses'
+    | '/api/public/v1/license/verify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -124,6 +137,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicV1LicensesRoute: typeof ApiPublicV1LicensesRoute
+  ApiPublicV1LicenseVerifyRoute: typeof ApiPublicV1LicenseVerifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1LicensesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/license/verify': {
+      id: '/api/public/v1/license/verify'
+      path: '/api/public/v1/license/verify'
+      fullPath: '/api/public/v1/license/verify'
+      preLoaderRoute: typeof ApiPublicV1LicenseVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -208,6 +229,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicV1LicensesRoute: ApiPublicV1LicensesRoute,
+  ApiPublicV1LicenseVerifyRoute: ApiPublicV1LicenseVerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
