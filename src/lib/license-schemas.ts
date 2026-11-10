@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const durationSchema = z.object({
-  days: z.coerce.number().int().min(0).max(3650).default(0),
-  hours: z.coerce.number().int().min(0).max(23).default(0),
-  minutes: z.coerce.number().int().min(0).max(59).default(0),
-  seconds: z.coerce.number().int().min(0).max(59).default(0),
+  days: z.coerce.number().int().min(0).max(365000).default(0),
+  hours: z.coerce.number().int().min(0).max(100000000).default(0),
+  minutes: z.coerce.number().int().min(0).max(1000000000).default(0),
+  seconds: z.coerce.number().int().min(0).max(100000000000).default(0),
 }).refine((value) => value.days + value.hours + value.minutes + value.seconds > 0, {
   message: "Enter a duration greater than zero",
 });
@@ -20,7 +20,7 @@ export const createLicenseSchema = z.object({
   duration: durationSchema,
   amountPaid: z.coerce.number().min(0).max(9999999999).default(0),
   paymentReference: z.string().trim().max(120).default(""),
-  deviceLimit: z.coerce.number().int().min(1).max(100).default(1),
+  deviceLimit: z.coerce.number().int().min(1).max(1000000).default(1),
 });
 
 export const updateCustomerSchema = createLicenseSchema
@@ -35,7 +35,7 @@ export const licenseActionSchema = z.object({
 
 export const deviceLimitSchema = z.object({
   licenseId: z.string().uuid(),
-  deviceLimit: z.coerce.number().int().min(1).max(100),
+  deviceLimit: z.coerce.number().int().min(1).max(1000000),
 });
 
 export const licenseIdSchema = z.object({ licenseId: z.string().uuid() });
@@ -55,3 +55,8 @@ export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;
 export function durationToSeconds(duration: z.infer<typeof durationSchema>) {
   return duration.days * 86400 + duration.hours * 3600 + duration.minutes * 60 + duration.seconds;
 }
+export const changeTimeSchema = z.object({
+  licenseId: z.string().uuid(),
+  seconds: z.coerce.number().int().refine((v) => v !== 0, "Enter an amount of time").optional(),
+  expiresAt: z.string().datetime({ offset: true }).optional(),
+}).refine((v) => v.seconds !== undefined || v.expiresAt !== undefined, { message: "Enter an amount of time or a date" });

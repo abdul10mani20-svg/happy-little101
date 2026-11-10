@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { bulkDeleteSchema, createLicenseSchema, deviceLimitSchema, durationToSeconds, licenseActionSchema, licenseIdSchema, updateCustomerSchema } from "./license-schemas";
+import { bulkDeleteSchema, changeTimeSchema, createLicenseSchema, deviceLimitSchema, durationToSeconds, licenseActionSchema, licenseIdSchema, updateCustomerSchema } from "./license-schemas";
 
 async function requireAdmin(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
@@ -86,6 +86,20 @@ export const performLicenseAction = createServerFn({ method: "POST" })
       ? { _license_id: data.licenseId, _action: data.action }
       : { _license_id: data.licenseId, _action: data.action, _seconds: data.seconds };
     const { data: result, error } = await context.supabase.rpc("admin_license_action", args);
+    if (error) throw new Error(error.message);
+    return result;
+  });
+
+export const changeLicenseTime = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => changeTimeSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { data: result, error } = await context.supabase.rpc("admin_change_license_time", {
+      _license_id: data.licenseId,
+      ...(data.seconds !== undefined ? { _seconds: data.seconds } : {}),
+      ...(data.expiresAt !== undefined ? { _expires_at: data.expiresAt } : {}),
+    });
     if (error) throw new Error(error.message);
     return result;
   });

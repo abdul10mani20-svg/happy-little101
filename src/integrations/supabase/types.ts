@@ -326,6 +326,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_change_license_time: {
+        Args: { _expires_at?: string; _license_id: string; _seconds?: number }
+        Returns: Json
+      }
       admin_create_license: {
         Args: {
           _amount_paid: number

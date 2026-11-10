@@ -64,6 +64,13 @@
       "when": 1792339893240,
       "tag": "0008_api_health_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794328150414,
+      "tag": "0009_flexible_device_limit_and_expiration",
+      "breakpoints": true
     }
   ]
 }
